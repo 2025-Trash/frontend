@@ -1,23 +1,36 @@
-/* src/pages/Dashboard.css */
+/* 전역 변수 설정 */
+:root {
+  --color-brand: #4caf50;
+  --color-brand-strong: #2e7d32;
+  --color-sub: #757575;
+  --color-text: #333;
+  --color-bg-personal: #F8FFF9;
+  --color-border-personal: #E6F8EC;
+  --color-bg-global: #F6FBFF;
+  --color-border-global: #E6F0F8;
+  --radius-md: 16px;
+  --shadow-base: 0 8px 24px rgba(0,0,0,0.06);
+}
+
 .dashboard-main {
   max-width: 768px;
   padding: 16px;
   margin: 0 auto 64px;
-  display: grid;
-  gap: 24px;
 }
 
 .dashboard-section {
   background: #fff;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   padding: 24px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-base);
 }
 
+/* 헤더 및 타이틀 */
 .section-title-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-direction: column;
 }
 
 .section-title {
@@ -27,64 +40,88 @@
 }
 
 .section-subtitle {
-  color: #4CAF50;
-  font-weight: 700;
-}
-
-/* 개인 나무 시각화 */
-.personal-section {
-  text-align: center;
-}
-
-.tree-container {
-  margin-top: 24px;
-  position: relative;
-  display: inline-block;
-}
-
-.my-tree-image {
-  width: 150px;
-  height: 150px;
-  transition: transform 0.5s ease-in-out;
-}
-
-.tree-progress {
   font-size: 14px;
-  color: #757575;
+  color: var(--color-sub);
   margin-top: 8px;
 }
 
-/* 커뮤니티 나무 시각화 */
-.community-section {
-  text-align: center;
-}
-
-.tree-community-visual {
+/* 통계 카드 그리드 */
+.stats-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 24px;
 }
 
-.community-trees-text {
-  font-size: 28px;
+.stat-card {
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.stat-card-personal {
+  background: var(--color-bg-personal);
+  border: 1px solid var(--color-border-personal);
+}
+
+.stat-card-global {
+  background: var(--color-bg-global);
+  border: 1px solid var(--color-border-global);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #737B7D;
+  font-weight: 700;
+}
+
+.stat-value {
   font-weight: 900;
-  color: #4CAF50;
+  font-size: 24px;
+  margin-top: 4px;
 }
 
-.community-progress-bar {
-  width: 100%;
-  height: 8px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  margin-top: 12px;
-  overflow: hidden;
+/* 오늘 성장 로그 */
+.daily-log {
+  margin-top: 24px;
+  color: var(--color-sub);
+  font-size: 14px;
 }
 
-.progress-fill {
-  height: 100%;
-  background-color: #4CAF50;
-  transition: width 0.5s ease;
+.highlight-brand {
+  color: var(--color-brand);
+  font-weight: 900;
 }
 
-.dashboard-login-needed {
+/* 숲 시각화 컨테이너 */
+.forest-visual-container {
+  margin-top: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+/* 정보 텍스트 */
+.info-text {
+  margin-top: 24px;
+  color: var(--color-sub);
+}
+.info-text strong {
+  color: var(--color-text);
+}
+.sub-info {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* CTA 버튼 */
+.cta-buttons {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.bin-info {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #737B7D;
   text-align: center;
-  color: #757575;
 }

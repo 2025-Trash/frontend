@@ -1,29 +1,38 @@
-/* src/pages/ValidatedSuccess.css */
+/*
+ * 전역 변수 설정 (공통 색상, 크기 등)
+ * 유지보수를 위해 변수화
+ */
+:root {
+  --color-brand-green: #4caf50;
+  --color-brand-strong: #2e7d32;
+  --color-bg-light: #e8f5e9;
+  --color-text-sub: #757575;
 
-/* Animation for the icon */
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.5; }
+  --icon-size-large: 160px;
+  --icon-size-medium: 132px;
+  --icon-size-small: 116px;
 }
 
+/* 애니메이션: 아이콘 나타나기 */
 @keyframes fade-in-scale {
   0% { opacity: 0; transform: scale(0.8); }
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Main Layout */
+/* 메인 레이아웃 */
 .success-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: #fff;
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
 }
 
 .success-main {
   flex: 1;
   max-width: 768px;
-  padding: 16px;
+  padding: 20px 16px;
   margin: 0 auto 64px;
   display: flex;
   flex-direction: column;
@@ -31,38 +40,15 @@
   justify-content: center;
 }
 
-/* Checkmark Icon Wrapper */
+/* 체크마크 아이콘 컨테이너 */
 .success-icon-wrapper {
-  width: 160px;
-  height: 160px;
+  width: var(--icon-size-large);
+  height: var(--icon-size-large);
   position: relative;
   margin: 24px auto 0;
 }
 
-.success-icon-wrapper::before,
-.success-icon-wrapper::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background-color: rgba(144, 215, 114, 0.37);
-  animation: pulse 2s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-.success-icon-wrapper::before {
-  width: 180px;
-  height: 180px;
-  animation-delay: 0.2s;
-}
-
-.success-icon-wrapper::after {
-  width: 160px;
-  height: 160px;
-}
-
-/* Actual Icon */
+/* 실제 아이콘 */
 .success-icon {
   width: 120px;
   height: 120px;
@@ -71,20 +57,21 @@
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background-color: #6CB74F;
+  background-color: var(--color-brand-green);
   color: #fff;
   font-size: 64px;
+  font-weight: 900;
   line-height: 120px;
   text-align: center;
-  font-weight: 900;
   z-index: 10;
-  animation: fade-in-scale 0.5s ease-out;
+  /* animation: fade-in-scale 0.5s ease-out; */
+  will-change: transform, opacity;
 }
 
-/* Text */
+/* 텍스트 */
 .success-heading {
   text-align: center;
-  color: var(--color-brand);
+  color: var(--color-brand-green);
   font-size: 32px;
   font-weight: 900;
   margin-top: 24px;
@@ -92,11 +79,11 @@
 
 .success-message {
   text-align: center;
-  color: var(--color-sub);
+  color: var(--color-text-sub);
   margin-top: 8px;
 }
 
-/* Buttons */
+/* 버튼 */
 .success-cta-buttons {
   max-width: 360px;
   margin: 32px auto 0;
@@ -105,54 +92,23 @@
   gap: 12px;
 }
 
-/* ===== Mobile-first polish ===== */
-
-/* 여백을 안전 영역까지 고려 (노치/홈바) */
-.success-container {
-  padding-left: env(safe-area-inset-left, 0);
-  padding-right: env(safe-area-inset-right, 0);
-  background-color: #fff;
-}
-
-/* 작은 화면에서 중앙 카드 느낌을 조금 더 타이트하게 */
-.success-main {
-  padding: 20px 16px;
-}
-
-/* 애니메이션 성능 힌트 */
-.success-icon,
-.success-icon-wrapper::before,
-.success-icon-wrapper::after {
-  will-change: transform, opacity;
-}
-
 /* 모션 민감 사용자 배려 */
 @media (prefers-reduced-motion: reduce) {
-  .success-icon,
-  .success-icon-wrapper::before,
-  .success-icon-wrapper::after {
+  .success-icon {
     animation: none !important;
   }
 }
 
-/* ====== ≤480px (일반적인 모바일) ====== */
+/* ====== ≤480px (모바일) ====== */
 @media (max-width: 480px) {
   .success-main {
-    margin: 0 auto 48px;      /* 하단 여백 약간 줄임 */
+    margin: 0 auto 48px;
   }
 
   .success-icon-wrapper {
-    width: 132px;
-    height: 132px;
+    width: var(--icon-size-medium);
+    height: var(--icon-size-medium);
     margin-top: 12px;
-  }
-  .success-icon-wrapper::before {
-    width: 148px;
-    height: 148px;
-  }
-  .success-icon-wrapper::after {
-    width: 132px;
-    height: 132px;
   }
 
   .success-icon {
@@ -166,11 +122,12 @@
     font-size: 26px;
     margin-top: 16px;
   }
+
   .success-message {
     font-size: 14px;
     line-height: 1.5;
     margin-top: 6px;
-    padding: 0 6px; /* 양옆 살짝 여유 */
+    padding: 0 6px;
   }
 
   .success-cta-buttons {
@@ -178,25 +135,17 @@
     gap: 10px;
     margin-top: 24px;
   }
-  /* 버튼 터치 영역 살짝 키우기(버튼 컴포넌트가 받아줄 경우) */
+
   .success-cta-buttons > * {
-    min-height: 44px; /* 권장 터치 높이 */
+    min-height: 44px;
   }
 }
 
 /* ====== ≤360px (소형 기기) ====== */
 @media (max-width: 360px) {
   .success-icon-wrapper {
-    width: 116px;
-    height: 116px;
-  }
-  .success-icon-wrapper::before {
-    width: 130px;
-    height: 130px;
-  }
-  .success-icon-wrapper::after {
-    width: 116px;
-    height: 116px;
+    width: var(--icon-size-small);
+    height: var(--icon-size-small);
   }
 
   .success-icon {
@@ -209,6 +158,7 @@
   .success-heading {
     font-size: 22px;
   }
+
   .success-message {
     font-size: 13px;
   }
@@ -224,6 +174,7 @@
   .success-main {
     padding: 24px;
   }
+
   .success-cta-buttons {
     max-width: 420px;
   }

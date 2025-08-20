@@ -1,4 +1,3 @@
-// src/pages/Validating.jsx
 import { useEffect } from "react";
 import Header from "../components/Header";
 import "./Validating.css"; // CSS 파일 import
@@ -14,7 +13,8 @@ export default function Validating(){
 
   return (
     <div className="validating-container">
-      <Header title="Validating" />
+      {/* 'Validating'을 '정보 확인 중'으로 변경 */}
+      <Header title="정보 확인 중" />
       <main className="validating-main">
         <h2 className="validating-heading">잠시 기다려주세요</h2>
         <p className="validating-message">직원에 의한 데이터 검증이 진행 중입니다</p>
@@ -26,9 +26,11 @@ export default function Validating(){
 
         {/* Fun Fact 섹션 */}
         <div className="fun-fact-card">
-          <h3 className="fun-fact-title">Fun Fact #1</h3>
+          {/* '환경뉴스 살펴보기'를 더 자연스럽게 변경 */}
+          <h3 className="fun-fact-title">잠깐, 환경 상식!</h3>
           <p className="fun-fact-text">
-            Did you know, Earth's ozone hole is getting smaller, the impact of the ban on the use of CFC gas
+            {/* 오존홀에 대한 내용을 더 정확하게 번역 */}
+            지구의 오존 구멍이 점점 줄어들고 있다는 사실, 알고 계셨나요? 이는 몬트리올 의정서 덕분입니다.
           </p>
           <p className="fun-fact-source">- eea europa</p>
         </div>
@@ -41,12 +43,14 @@ export default function Validating(){
         >
           <div className="news-thumbnail">
             {/* 뉴스 썸네일 이미지 */}
-            <img src="https://www.usatoday.com/gcdn/authoring/2022/09/25/USAT/ghg0p4-ozone.jpg?width=660&height=401&fit=crop&format=pjpg&auto=webp" alt="Ozone Hole" />
+            <img src="https://www.usatoday.com/gcdn/authoring/2022/09/25/USAT/ghg0p4-ozone.jpg?width=660&height=401&fit=crop&format=pjpg&auto=webp" alt="오존홀" />
           </div>
           <div className="news-content">
-            <p className="news-category">International</p>
-            <h4 className="news-title">Humanity healed the ozone hole. Can we do the same for...</h4>
-            <p className="news-source">USA Today · 25 September 2022...</p>
+            <p className="news-category">국제</p>
+            {/* 뉴스 제목을 자연스럽게 번역 */}
+            <h4 className="news-title">인류가 오존층 구멍을 치유했습니다. 기후 변화도 가능할까요?</h4>
+            {/* 뉴스 출처와 날짜를 한국어 스타일로 변경 */}
+            <p className="news-source">USA Today · 2022년 9월 25일...</p>
           </div>
         </a>
       </main>

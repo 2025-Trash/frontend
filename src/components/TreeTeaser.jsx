@@ -1,9 +1,8 @@
-// src/components/TreeTeaser.jsx
-import React, { useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import "./TreeTeaser.css";
 
-// 단계 이미지 (src/assets/trees/ 에 저장)
+// 단계 이미지
 import stage1 from "../assets/trees/tree-1.png"; // 새싹
 import stage2 from "../assets/trees/tree-2.png"; // 중간
 import stage3 from "../assets/trees/tree-3.png"; // 완성
@@ -18,8 +17,23 @@ function getGlobal() {
 }
 
 export default function TreeTeaser({ perTree = 100, maxTiles = 6 }) {
-  const global = getGlobal();
-  const totalUses = Number(global.totalUses || 0);
+  const [globalStats, setGlobalStats] = useState({ totalUses: 0, totalPoints: 0 });
+
+  useEffect(() => {
+    setGlobalStats(getGlobal());
+
+    const handleStorageChange = () => {
+      setGlobalStats(getGlobal());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const totalUses = Number(globalStats.totalUses || 0);
 
   const trees = Math.floor(totalUses / perTree);
   const progress = totalUses % perTree;
@@ -27,27 +41,31 @@ export default function TreeTeaser({ perTree = 100, maxTiles = 6 }) {
   const leftToNext = perTree - progress === perTree ? 0 : perTree - progress;
 
   const tiles = useMemo(() => {
-    const count = Math.min(maxTiles, Math.max(1, trees || 1));
-    const arr = Array.from({ length: count }, () => stage3);
-    const stage = pct >= 67 ? stage3 : pct >= 34 ? stage2 : stage1;
+    const numTrees = Math.floor(totalUses / perTree);
+    const progress = totalUses % perTree;
+    
+    const completedTrees = Math.min(maxTiles - 1, numTrees);
+    const showGrowingTree = numTrees < maxTiles || progress > 0;
+    
+    const tileArray = Array(completedTrees).fill(stage3);
+    
+    if (showGrowingTree) {
+        const stage = progress >= perTree * 0.67 ? stage3 : progress >= perTree * 0.34 ? stage2 : stage1;
+        tileArray.push(stage);
+    }
 
-    if (trees === 0) {
-      arr[0] = stage; // 첫 그루 전이면 성장중만 1칸
-      return arr;
-    }
-    // 다음 그루가 진행 중이면 마지막 칸에 성장 단계로 표시
-    if (progress > 0) {
-      arr[arr.length - 1] = stage;
-    }
-    return arr;
-  }, [trees, progress, pct, maxTiles]);
+    return tileArray;
+  }, [totalUses, perTree, maxTiles]);
 
   return (
     <section className="forest-teaser" aria-labelledby="forest-teaser-title">
       <div className="forest-head">
         <div className="forest-eyebrow">우리 모두의 숲</div>
-        <h3 id="forest-teaser-title" className="forest-title" aria-live="polite">
-          함께 키운 나무 <b className="forest-strong">{trees.toLocaleString()}</b>그루
+        <h3 id="forest-teaser-title">
+          함께 키운 나무{" "}
+          <b className="forest-strong" aria-live="polite" aria-atomic="true">
+            {trees.toLocaleString()}
+          </b>그루
         </h3>
         <p className="forest-sub">
           다음 나무까지 <b className="forest-strong">{leftToNext}</b>회
