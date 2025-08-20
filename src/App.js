@@ -1,25 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route, Navigate, useSearchParams } from "react-router-dom";
+import Welcome from "./pages/Welcome";
+import SignUp from "./pages/SignUp";
+import Validating from "./pages/Validating";
+import ValidatedSuccess from "./pages/ValidatedSuccess";
+import TransactionDetail from "./pages/TransactionDetail";
+import Dashboard from "./pages/Dashboard";
 
-function App() {
+export default function App() {
+  const [params] = useSearchParams();
+  const bin = params.get("bin") || undefined; // qr?bin=... 으로 들어온 값
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<Welcome />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/validating" element={<Validating />} />
+      <Route path="/validated" element={<ValidatedSuccess />} />
+      <Route path="/transaction" element={<TransactionDetail />} />
+      <Route path="/dashboard" element={<Dashboard bin={bin} />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
-
-export default App;
