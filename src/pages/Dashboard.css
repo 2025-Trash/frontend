@@ -1,0 +1,90 @@
+/* src/pages/Dashboard.css */
+.dashboard-main {
+  max-width: 768px;
+  padding: 16px;
+  margin: 0 auto 64px;
+  display: grid;
+  gap: 24px;
+}
+
+.dashboard-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.section-title-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.section-subtitle {
+  color: #4CAF50;
+  font-weight: 700;
+}
+
+/* 개인 나무 시각화 */
+.personal-section {
+  text-align: center;
+}
+
+.tree-container {
+  margin-top: 24px;
+  position: relative;
+  display: inline-block;
+}
+
+.my-tree-image {
+  width: 150px;
+  height: 150px;
+  transition: transform 0.5s ease-in-out;
+}
+
+.tree-progress {
+  font-size: 14px;
+  color: #757575;
+  margin-top: 8px;
+}
+
+/* 커뮤니티 나무 시각화 */
+.community-section {
+  text-align: center;
+}
+
+.tree-community-visual {
+  margin-top: 24px;
+}
+
+.community-trees-text {
+  font-size: 28px;
+  font-weight: 900;
+  color: #4CAF50;
+}
+
+.community-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.5s ease;
+}
+
+.dashboard-login-needed {
+  text-align: center;
+  color: #757575;
+}
