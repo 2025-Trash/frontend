@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import TreeGarden from "../components/TreeGarden";
 import BadgeStrip from "../components/BadgeStrip";
+import "./Dashboard.css"; // CSS 파일 import
 
 // ---------------- helpers ----------------
 function getUser() {
@@ -51,7 +52,7 @@ export default function Dashboard({ bin }) {
     }
   }, [user]);
 
-  const perTree = 100;
+  const perTree = 30; // 30회당 1그루로 수정
   const treesCommunity = useMemo(() => Math.floor(global.totalUses / perTree), [global.totalUses]);
   const treesPersonal  = useMemo(() => Math.floor((user?.uses || 0) / perTree), [user]);
 
@@ -109,75 +110,76 @@ export default function Dashboard({ bin }) {
   return (
     <div>
       <Header title="대시보드" />
-      <main style={{ maxWidth: 768, padding: 16, margin: "0 auto 64px" }}>
-        <section style={{
-          background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 8px 24px rgba(0,0,0,0.06)"
-        }}>
-          <div style={{ fontSize: 18, fontWeight: 900 }}>
-            {user ? `${user.name}님 반가워요!` : "로그인이 필요합니다"}
+      <main className="dashboard-main">
+        <section className="dashboard-section">
+          <div className="section-title-wrapper">
+            <h2 className="section-title">
+              {user ? `${user.name}님 반가워요!` : "로그인이 필요합니다"}
+            </h2>
+            <p className="section-subtitle">
+              {user ? (
+                <>쓰레기통 사용 시마다 포인트가 +4 적립됩니다.</>
+              ) : (
+                <>회원가입 또는 로그인 후 사용 기록/포인트 확인이 가능합니다.</>
+              )}
+            </p>
           </div>
-          <p style={{ color: "var(--sub)", marginTop: 8 }}>
-            {user
-              ? <>쓰레기통 사용 시마다 포인트가 +4 적립됩니다.</>
-              : <>회원가입 또는 로그인 후 사용 기록/포인트 확인이 가능합니다.</>}
-          </p>
-
+          
           {/* 숫자 카드 */}
-          <div style={{
-            display: "grid", gap: 12, gridTemplateColumns: "repeat(2, minmax(0, 1fr))", marginTop: 12
-          }}>
-            <div style={{ background: "#F8FFF9", border: "1px solid #E6F8EC", borderRadius: 12, padding: 12 }}>
-              <div style={{ fontSize: 12, color: "#737B7D", fontWeight: 700 }}>나의 사용 횟수</div>
-              <div style={{ fontWeight: 900, fontSize: 22 }}>{user?.uses ?? 0}</div>
+          <div className="stats-grid">
+            <div className="stat-card stat-card-personal">
+              <div className="stat-label">나의 사용 횟수</div>
+              <div className="stat-value">{user?.uses ?? 0}</div>
             </div>
-            <div style={{ background: "#F8FFF9", border: "1px solid #E6F8EC", borderRadius: 12, padding: 12 }}>
-              <div style={{ fontSize: 12, color: "#737B7D", fontWeight: 700 }}>나의 포인트</div>
-              <div style={{ fontWeight: 900, fontSize: 22 }}>{user?.points ?? 0}</div>
+            <div className="stat-card stat-card-personal">
+              <div className="stat-label">나의 포인트</div>
+              <div className="stat-value">{user?.points ?? 0}</div>
             </div>
-            <div style={{ background: "#F6FBFF", border: "1px solid #E6F0F8", borderRadius: 12, padding: 12 }}>
-              <div style={{ fontSize: 12, color: "#737B7D", fontWeight: 700 }}>전체 사용 횟수</div>
-              <div style={{ fontWeight: 900, fontSize: 22 }}>{global.totalUses}</div>
+            <div className="stat-card stat-card-global">
+              <div className="stat-label">전체 사용 횟수</div>
+              <div className="stat-value">{global.totalUses}</div>
             </div>
-            <div style={{ background: "#F6FBFF", border: "1px solid #E6F0F8", borderRadius: 12, padding: 12 }}>
-              <div style={{ fontSize: 12, color: "#737B7D", fontWeight: 700 }}>전체 포인트</div>
-              <div style={{ fontWeight: 900, fontSize: 22 }}>{global.totalPoints}</div>
+            <div className="stat-card stat-card-global">
+              <div className="stat-label">전체 포인트</div>
+              <div className="stat-value">{global.totalPoints}</div>
             </div>
           </div>
 
           {/* 오늘 성장 로그 */}
-          <div style={{ marginTop: 8, color: "var(--sub)", fontSize: 13 }}>
+          <div className="daily-log">
             {user ? (
-              <>오늘 <b style={{ color: "var(--brand)" }}>{todayUses}</b>회 이용으로 개인 나무가 <b style={{ color: "var(--brand)" }}>{personalPct}%</b>까지 성장했어요.</>
+              <>오늘 <b className="highlight-brand">{todayUses}</b>회 이용으로 개인 나무가 <b className="highlight-brand">{personalPct}%</b>까지 성장했어요.</>
             ) : (
               <>로그인하면 오늘 성장 로그가 표시됩니다.</>
             )}
           </div>
 
           {/* 숲 시각화 */}
-          <div style={{ marginTop: 16, display: "grid", gap: 16 }}>
+          <div className="forest-visual-container">
             <TreeGarden uses={user?.uses ?? 0} perTree={perTree} label="나의 숲" />
             <BadgeStrip trees={treesPersonal} />
             <TreeGarden uses={global.totalUses} perTree={perTree} label="우리 모두의 숲" maxColumns={8} />
           </div>
 
           {/* 안내 문구 */}
-          <div style={{ marginTop: 16, color: "var(--sub)" }}>
-            <strong style={{ color: "var(--text)" }}>
-              {user?.name || "여러분"}님과 사이트 사용자들이{" "}
-              <span style={{ color: "var(--brand)" }}>{treesCommunity}</span> 그루의 나무를 살렸습니다.
+          <div className="info-text">
+            <strong>
+              {user?.name || "여러분"}님과 사이트 사용자들이{" "}<br></br>
+              <span className="highlight-brand">{treesCommunity}</span>그루의 나무를 살렸습니다.
             </strong>
-            <div style={{ fontSize: 12, marginTop: 4 }}>(개인 기준: {treesPersonal} 그루 / 100회당 1그루 환산)</div>
+            {/* 100회당 1그루에서 30회당 1그루로 수정 */}
+            <div className="sub-info">(개인 기준: {treesPersonal} 그루 / 30회당 1그루 환산)</div>
           </div>
 
           {/* CTA */}
-          <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+          <div className="cta-buttons">
             <Button onClick={useOnce}>{user ? "쓰레기통 사용하기 (+1)" : "로그인/가입 후 이용"}</Button>
             <Button variant="outline" onClick={resetDemo}>데모 데이터 초기화</Button>
           </div>
 
           {bin && (
-            <div style={{ marginTop: 12, fontSize: 12, color: "#737B7D" }}>
-              현재 QR로 전달된 쓰레기통 ID: <strong style={{ color: "var(--brand)" }}>{bin}</strong>
+            <div className="bin-info">
+              현재 QR로 전달된 쓰레기통 ID: <strong className="highlight-brand">{bin}</strong>
             </div>
           )}
         </section>
