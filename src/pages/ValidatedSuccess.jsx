@@ -17,7 +17,7 @@ export default function ValidatedSuccess() {
 
         {/* 헤딩 문구를 더 친근하게 변경 */}
         <h2 className="success-heading">
-          축하해요! 포인트가 적립되었습니다
+          축하해요!<br></br>포인트가 적립되었습니다
         </h2>
 
         {/* 메시지 문구를 더 명확하게 변경 */}

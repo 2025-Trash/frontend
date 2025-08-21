@@ -9,7 +9,7 @@ import LoginPage from "./pages/Loginpage";
 
 export default function App() {
   const [params] = useSearchParams();
-  const bin = params.get("bin") || undefined; // qr?bin=... 으로 들어온 값
+  const bin = params.get("bin") || undefined; 
 
   return (
     <Routes>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./TreeTeaser.css";
 
@@ -7,36 +7,122 @@ import stage1 from "../assets/trees/tree-1.png"; // 새싹
 import stage2 from "../assets/trees/tree-2.png"; // 중간
 import stage3 from "../assets/trees/tree-3.png"; // 완성
 
-/* -------- storage helpers -------- */
-function safeParse(json, fallback) {
-  try { return JSON.parse(json); } catch { return fallback; }
+/** ================================
+ *  Storage / Backend Helper
+ *  ================================ */
+const LS_KEY = "global_stats";
+
+function isPlainObject(v) {
+  return v !== null && typeof v === "object" && !Array.isArray(v);
 }
-function readGlobal() {
-  const raw = localStorage.getItem("global_stats");
+
+function safeParse(json, fallback) {
+  try {
+    const parsed = JSON.parse(json);
+    return isPlainObject(parsed) ? parsed : fallback; // null/배열/문자열/숫자 → fallback
+  } catch {
+    return fallback;
+  }
+}
+
+function readLocalStats() {
+  const raw = localStorage.getItem(LS_KEY);
+  if (raw === null || raw === "null" || raw === "undefined" || raw === "") {
+    return { totalUses: 0, totalPoints: 0 };
+  }
   const obj = safeParse(raw, { totalUses: 0, totalPoints: 0 });
-  return {
-    totalUses: Number(obj.totalUses || 0),
-    totalPoints: Number(obj.totalPoints || 0),
+  const totalUses = Number.isFinite(Number(obj.totalUses)) ? Number(obj.totalUses) : 0;
+  const totalPoints = Number.isFinite(Number(obj.totalPoints)) ? Number(obj.totalPoints) : 0;
+  return { totalUses, totalPoints };
+}
+
+function writeLocalStats(stats) {
+  const toWrite = {
+    totalUses: Number.isFinite(Number(stats?.totalUses)) ? Number(stats.totalUses) : 0,
+    totalPoints: Number.isFinite(Number(stats?.totalPoints)) ? Number(stats.totalPoints) : 0,
   };
+  localStorage.setItem(LS_KEY, JSON.stringify(toWrite));
 }
 
 /**
- * TreeTeaser
- * - 커뮤니티 기준: perTree=30회 => 1그루
- * - maxTiles: 썸네일 격자에 보여줄 최대 그루 수 (나머지는 +N으로 요약)
+ * 백엔드로부터 글로벌 통계 가져오기 (토큰이 있을 때만 시도)
+ * - 성공: {totalUses,totalPoints} 반환 + 로컬 저장소에도 동기화
+ * - 실패: undefined 반환 (호출부에서 로컬 폴백)
  */
-export default function TreeTeaser({ perTree = 30, maxTiles = 12 }) {
-  const [stats, setStats] = useState(() => readGlobal());
+async function fetchGlobalFromApi({ apiBase = "/api", authToken, signal }) {
+  if (!authToken) return undefined; // 토큰 없으면 백엔드 호출 안 함
+  try {
+    const res = await fetch(`${apiBase}/stats/global`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      signal,
+      credentials: "include", // 쿠키 인증도 병행한다면 유지
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!isPlainObject(data)) throw new Error("Invalid payload");
 
-  // 실시간 동기화: storage(다른 탭), 폴링(같은 탭), visibilitychange
+    const totalUses = Number.isFinite(Number(data.totalUses)) ? Number(data.totalUses) : 0;
+    const totalPoints = Number.isFinite(Number(data.totalPoints)) ? Number(data.totalPoints) : 0;
+
+    // 로컬에도 동기화(오프라인/비로그인 시 연속성)
+    writeLocalStats({ totalUses, totalPoints });
+    return { totalUses, totalPoints };
+  } catch {
+    return undefined;
+  }
+}
+
+/** ================================
+ *  Component
+ *  ================================ */
+/**
+ * TreeTeaser
+ * - perTree: 몇 회당 나무 1그루인지
+ * - maxTiles: 격자에 보여줄 최대 타일 수
+ * - apiBase: 백엔드 베이스 경로 (기본 "/api")
+ * - authToken: 외부에서 토큰 주입 가능 (없으면 localStorage.auth_token 시도)
+ */
+export default function TreeTeaser({
+  perTree = 30,
+  maxTiles = 12,
+  apiBase = "/api",
+  authToken: authTokenProp,
+}) {
+  // 잘못된 값 사전 방어
+  const safePerTree = perTree > 0 ? perTree : 30;
+  const [stats, setStats] = useState(() => readLocalStats());
+  const abortRef = useRef(null);
+
+  // 초기 정리: "null"/"undefined"/"" 같은 쓰레기 값 제거
+  useEffect(() => {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw === "null" || raw === "undefined" || raw === "") {
+      localStorage.removeItem(LS_KEY);
+    }
+  }, []);
+
+  // 로그인 감지: prop 우선, 없으면 localStorage에서 조회
+  const authToken =
+    typeof authTokenProp === "string" && authTokenProp.length > 0
+      ? authTokenProp
+      : (() => {
+          const t = localStorage.getItem("auth_token");
+          return t && t !== "null" && t !== "undefined" ? t : undefined;
+        })();
+
+  // 스토리지/가시성/폴링으로 로컬 동기화
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key === "global_stats") setStats(readGlobal());
+      if (e.key === LS_KEY) setStats(readLocalStats());
     };
     const onVisibility = () => {
-      if (!document.hidden) setStats(readGlobal());
+      if (!document.hidden) setStats(readLocalStats());
     };
-    const poll = setInterval(() => setStats(readGlobal()), 1500);
+    const poll = setInterval(() => setStats(readLocalStats()), 1500);
 
     window.addEventListener("storage", onStorage);
     document.addEventListener("visibilitychange", onVisibility);
@@ -47,29 +133,53 @@ export default function TreeTeaser({ perTree = 30, maxTiles = 12 }) {
     };
   }, []);
 
+  // 백엔드가 있으면 주기적으로 동기화(로그인 상태 가정)
+  useEffect(() => {
+    if (!authToken) return; // 비로그인: 로컬만 사용
+
+    const syncOnce = async (signal) => {
+      const api = await fetchGlobalFromApi({ apiBase, authToken, signal });
+      if (api) setStats(api); // 성공 시 백엔드 기준으로 갱신
+      else setStats(readLocalStats()); // 실패 시 로컬
+    };
+
+    // 즉시 1회 동기화
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
+    syncOnce(abortRef.current.signal);
+
+    // 30초마다 백엔드 동기화
+    const t = setInterval(() => {
+      abortRef.current?.abort();
+      abortRef.current = new AbortController();
+      syncOnce(abortRef.current.signal);
+    }, 30_000);
+
+    return () => {
+      clearInterval(t);
+      abortRef.current?.abort();
+    };
+  }, [authToken, apiBase]);
+
   const totalUses = stats.totalUses;
 
   // 그루/진행도 계산
-  const trees = Math.floor(totalUses / perTree);
-  const progress = totalUses % perTree;               // 다음 그루까지 남은 회수 계산의 기준
-  const leftToNext = progress === 0 ? 0 : perTree - progress;
-  const pct = Math.round((progress / perTree) * 100);
+  const trees = Math.floor(totalUses / safePerTree);
+  const progress = totalUses % safePerTree;
+  const leftToNext = progress === 0 ? 0 : safePerTree - progress;
+  const pct = Math.round((progress / safePerTree) * 100);
 
-  // 격자에 표시할 타일: 완성 그루 + 성장중 1개
+  // 격자 타일 계산(완성 그루 + 성장중 1개)
   const { tiles, overflowCount } = useMemo(() => {
-    const fullCount = Math.min(trees, Math.max(0, maxTiles)); // 완성 그루 타일
+    const fullCount = Math.min(trees, Math.max(0, maxTiles));
     const remainTiles = Math.max(0, maxTiles - fullCount);
-
-    // 성장중 타일을 표시할지 결정: progress > 0 이고, 보여줄 칸이 남았을 때
     const showGrowing = progress > 0 && remainTiles > 0;
 
-    // 완성 타일들
     const arr = Array(fullCount).fill(stage3);
-
     if (showGrowing) {
       const stage =
-        progress >= perTree * 0.67 ? stage3 :
-        progress >= perTree * 0.34 ? stage2 : stage1;
+        progress >= safePerTree * 0.67 ? stage3 :
+        progress >= safePerTree * 0.34 ? stage2 : stage1;
       arr.push(stage);
     }
 
@@ -78,7 +188,7 @@ export default function TreeTeaser({ perTree = 30, maxTiles = 12 }) {
     const overflow = Math.max(0, totalTreesToRepresent - totalShown);
 
     return { tiles: arr, overflowCount: overflow };
-  }, [trees, progress, perTree, maxTiles]);
+  }, [trees, progress, safePerTree, maxTiles]);
 
   return (
     <section className="forest-teaser" aria-labelledby="forest-teaser-title">
@@ -103,7 +213,10 @@ export default function TreeTeaser({ perTree = 30, maxTiles = 12 }) {
           </div>
         ))}
         {overflowCount > 0 && (
-          <div className="forest-cell more" aria-label={`추가 나무 ${overflowCount}그루`}>
+          <div
+            className="forest-cell more"
+            aria-label={`추가 나무 ${overflowCount}그루`}
+          >
             +{overflowCount.toLocaleString()}
           </div>
         )}
@@ -114,7 +227,7 @@ export default function TreeTeaser({ perTree = 30, maxTiles = 12 }) {
         role="progressbar"
         aria-label="다음 나무까지 진행률"
         aria-valuemin={0}
-        aria-valuemax={perTree}
+        aria-valuemax={safePerTree}
         aria-valuenow={progress}
       >
         <div className="forest-progress-fill" style={{ width: `${pct}%` }} />
