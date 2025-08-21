@@ -56,17 +56,17 @@ const REWARDS = [
 ];
 
 /* ===== 조정 가능한 상수 ===== */
-const PERSONAL_PER_TREE = 10; // 개인: 10회 = 1그루
-const COMMUNITY_PER_TREE = 30; // 커뮤니티: 30회 = 1그루
+const PERSONAL_PER_TREE = 10;   // 개인: 10회 = 1그루
+const COMMUNITY_PER_TREE = 30;  // 커뮤니티: 30회 = 1그루
 const REWARD_EXPIRE_HOURS = 48;
 
 function clampPct(n) { return Math.max(0, Math.min(100, Math.round(n))); }
 
 /* ================= ForestField =================
-   넓은 잔디 배경에 작은 나무(🌳)를 “그루 수”만큼 렌더링합니다.
-   - trees: 그루 수(=이모지 개수)
-   - cap: 렌더 상한 (초과분은 +N으로 표시)
-   - size: 이모지 크기(px)
+  넓은 잔디 배경에 작은 나무(🌳)를 “그루 수”만큼 렌더링합니다.
+  - trees: 그루 수(=이모지 개수)
+  - cap: 렌더 상한 (초과분은 +N으로 표시)
+  - size: 이모지 크기(px)
 */
 function ForestField({ trees = 0, cap = 300, size = 18, label, variant = "light" }) {
   const count = Math.min(trees, cap);
@@ -164,6 +164,9 @@ export default function Dashboard({ bin }) {
     return sum;
   }, [globalDaily, range]);
 
+  // ✅ 내가 오늘 올린 ‘우리의 숲’ 성장 기여도(%) = 오늘 내 사용 / 커뮤니티 1그루 기준
+  const communityContributionPct = clampPct((todayUses / COMMUNITY_PER_TREE) * 100);
+
   /* -------- 쓰레기통 사용 -------- */
   const useOnceWithCafe = (cafeId) => {
     if (!user) { window.location.href = "/signup"; return; }
@@ -240,12 +243,39 @@ export default function Dashboard({ bin }) {
           <div className="section-title-wrapper">
             <h2 className="section-title">
               {user
-                ? `${user.name}님, 오늘도 한 그루 심어볼까요? 🌱`
+                ? (
+                  <>
+                    {user.name}님,<br />
+                    오늘도 한 그루 심어볼까요? 🌱
+                  </>
+                )
                 : "로그인이 필요합니다"}
             </h2>
-            <p className="section-subtitle">
-              {user ? <>쓰레기통을 사용할 때마다 +4p, 우리의 숲이 더 푸르게 자라요.</>
-                   : <>회원가입 또는 로그인 후 이용 기록/포인트를 확인할 수 있어요.</>}
+
+            {/* ✅ 상단에 ‘나의 사용/포인트’ 칩 배치 */}
+            <div className="title-stats" aria-label="내 정보 요약">
+              <div className="stat-chip">
+                <span className="chip-label">나의 사용 횟수</span>
+                <span className="chip-value">{user?.uses ?? 0}</span>
+              </div>
+              <div className="stat-chip">
+                <span className="chip-label">나의 포인트</span>
+                <span className="chip-value">{user?.points ?? 0}</span>
+              </div>
+            </div>
+
+            <p className="section-sub">
+              {user ? (
+                <>
+                  쓰레기통을 사용할 때마다 +4p,<br />
+                  우리의 숲이 더 푸르게 자라요.
+                </>
+              ) : (
+                <>
+                  회원가입 또는 로그인 후<br />
+                  이용 기록/포인트를 확인할 수 있어요.
+                </>
+              )}
             </p>
           </div>
 
@@ -257,7 +287,6 @@ export default function Dashboard({ bin }) {
                 <span className="forest-chip personal">다음 나무까지 {personalPct}%</span>
               </div>
 
-              {/* 이모지 개수 = 그루 수 */}
               <ForestField
                 trees={treesPersonal}
                 label="나의 숲"
@@ -298,7 +327,6 @@ export default function Dashboard({ bin }) {
                 </div>
               </div>
 
-              {/* 이모지 개수 = 그루 수 */}
               <ForestField
                 trees={treesCommunity}
                 label="우리 모두의 숲"
@@ -330,22 +358,10 @@ export default function Dashboard({ bin }) {
             </div>
           </div>
 
-          {/* 개인 핵심 숫자 (간결) */}
-          <div className="stats-and-growth-grid">
-            <div className="stat-card">
-              <div className="stat-label">나의 사용 횟수</div>
-              <div className="stat-value">{user?.uses ?? 0}</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-label">나의 포인트</div>
-              <div className="stat-value">{user?.points ?? 0}</div>
-            </div>
-          </div>
-
-          {/* 오늘 개인 로그 */}
+          {/* 내가 ‘우리의 숲’에 기여한 성장도 문구 */}
           <div className="daily-log">
             {user
-              ? <>오늘 <b className="highlight-brand">{todayUses}</b>회 사용으로 개인 숲이 <b className="highlight-brand">{personalPct}%</b> 성장했어요. 한 그루, 또 한 그루 함께 심어요!</>
+              ? <>오늘 <b className="highlight-brand">{todayUses}</b>회 사용으로 <b className="highlight-brand">우리의 숲</b>이 <b className="highlight-brand">+{communityContributionPct}%</b> 성장했어요. <br />한 그루, 또 한 그루 함께 심어요!</>
               : <>로그인하여 숲을 함께 키워보아요.</>}
           </div>
 
@@ -417,8 +433,10 @@ function RewardList({ user, onRedeem }) {
                       onClick={() => can && onRedeem({ ...r, cafeId: cafe.id, cafeName: cafe.name })}
                       disabled={!can}
                       title={can ? `${r.title} 교환하기` : "포인트가 부족합니다"}
+                      aria-label={`${r.tier} (${r.cost}p) - ${r.title}${can ? "" : " (포인트 부족)"}`}
                     >
-                      {r.tier} • {r.cost}p
+                      <span className="badge-top">{r.tier} · {r.cost}p</span>
+                      <span className="badge-sub">{r.title}</span>
                     </button>
                   </li>
                 );

@@ -33,10 +33,9 @@
 
 /* 헤더 및 타이틀 */
 .section-title-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
   text-align: center;
 }
 .section-title {
@@ -44,11 +43,31 @@
   font-weight: 900;
   margin: 0;
 }
-.section-subtitle {
+.section-sub {
   font-size: 14px;
   color: var(--color-sub);
-  margin-top: 8px;
+  margin: 4px 0 0;
 }
+
+/* ✅ 상단 요약 칩 */
+.title-stats {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+.stat-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-personal);
+  background: var(--color-bg-personal);
+}
+.chip-label { font-size: 12px; color: #5a6a5f; font-weight: 700; }
+.chip-value { font-weight: 900; }
 
 /* 숲 시각화 컨테이너 */
 .forest-visual-container {
@@ -72,7 +91,6 @@
   background: var(--color-bg-global);
   border: 1px solid var(--color-border-global);
   color: #f4fff5;
-  /* 배경 텍스처 느낌 */
   background-image:
     radial-gradient(transparent 60%, rgba(255,255,255,0.04) 61%),
     linear-gradient(0deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03));
@@ -189,7 +207,6 @@
   background: linear-gradient(180deg, #21583a 0%, #123a27 100%);
 }
 .field-grass::before {
-  /* 은은한 격자 */
   content: "";
   position: absolute; inset: 0;
   background-image:
@@ -219,26 +236,13 @@
   border: 1px solid rgba(0,0,0,.08);
 }
 
-/* 개인 핵심 숫자 (간결) */
-.stats-and-growth-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px; margin-top: 16px;
-}
-.stat-card {
-  border-radius: 12px; padding: 16px;
-  background: var(--color-bg-personal);
-  border: 1px solid var(--color-border-personal);
-}
-.stat-label { font-size: 12px; color: #737B7D; font-weight: 700; }
-.stat-value { font-weight: 900; font-size: 24px; margin-top: 4px; }
-
 /* 오늘 로그 */
 .daily-log { margin-top: 16px; color: var(--color-sub); font-size: 14px; }
 .highlight-brand { color: var(--color-brand); font-weight: 900; }
 
 /* 리워드 */
 .reward-list { margin-top: 24px; }
-.list-head { display: flex; justify-content: space-between; align-items: baseline; }
+.list-head { display: flex; justify-content: space-between; align-items: baseline; padding-top: 40px; }
 .list-head h3 { margin: 0; font-size: 16px; }
 .my-points { font-size: 12px; color: var(--color-sub); }
 .partner-scroller { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
@@ -246,11 +250,17 @@
 .partner-title { font-weight: 800; margin-bottom: 8px; }
 .reward-badges { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .badge .badge-btn {
-  border: 1px solid #DDE7F5; background: #fff; border-radius: 999px; padding: 8px 12px;
+  display: grid;
+  align-items: center;
+  justify-items: start;
+  row-gap: 2px;
+  border: 1px solid #DDE7F5; background: #fff; border-radius: 12px; padding: 8px 8px;
   font-size: 12px; font-weight: 800; cursor: pointer;
-  transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+  transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
 }
-.badge.can .badge-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-soft); border-color: var(--color-brand); }
+.badge .badge-btn .badge-top { font-weight: 900; }
+.badge .badge-btn .badge-sub { font-weight: 600; opacity: .9; font-size: 11px; }
+.badge.can .badge-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-soft); border-color: var(--color-brand); background: #F6FFF7; }
 .badge.cannot .badge-btn { opacity: .5; cursor: not-allowed; }
 
 /* 쿠폰함 */
@@ -282,4 +292,13 @@
 @media (min-width: 720px) {
   .forest-visual-container { grid-template-columns: 1fr 1fr; }
   .partner-scroller { grid-template-columns: 1fr 1fr; }
+  .section-title-wrapper {
+    grid-template-columns: 1fr auto;
+    text-align: left;
+    justify-items: stretch;
+    align-items: center;
+  }
+  .title-stats {
+    justify-content: flex-end;
+  }
 }
