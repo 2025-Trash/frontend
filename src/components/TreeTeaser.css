@@ -42,10 +42,18 @@
   display: grid;
   place-items: center;
   overflow: hidden;
+  position: relative;
 }
 .forest-cell img {
   width: 52px;
   height: auto;
+}
+.forest-cell.more {
+  font-weight: 900;
+  color: #1b5e20;
+  background: #ECF7EF;
+  border: 1px dashed #CDE9D4;
+  font-size: 14px;
 }
 
 /* 진행 바 */
@@ -59,7 +67,7 @@
 }
 .forest-progress-fill {
   height: 100%;
-  background: #4CAF50;
+  background: linear-gradient(90deg, #4CAF50, #2E7D32);
   transition: width .35s ease;
 }
 

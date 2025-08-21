@@ -20,7 +20,7 @@ export default function Welcome() {
 
       {/* 히어로 섹션 */}
       <section className="hero-section" role="banner">
-        <h1>(프로젝트명)</h1>
+        <h1>CupCycle</h1>
         <p className="hero-subtitle">지속 가능한 선택을 위한 첫걸음</p>
       </section>
 
@@ -32,14 +32,14 @@ export default function Welcome() {
         {/* 우리 모두의 숲 - 요약 티저 (CTA 위에 배치) */}
         <div className="forest-teaser-wrap" aria-label="우리 모두의 숲 요약">
           {/* perTree=100 기준, localStorage의 global_stats.totalUses 사용 */}
-          <TreeTeaser perTree={100} />
+          <TreeTeaser perTree={30} />
         </div>
 
         <div className="cta-container">
           <Button as={Link} to="/signup" variant="primary" block>
             회원가입
           </Button>
-          <Button as={Link} to="/dashboard" variant="outline" block>
+          <Button as={Link} to="/login" variant="outline" block>
             로그인
           </Button>
         </div>

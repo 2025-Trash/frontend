@@ -8,7 +8,7 @@ const STAGES = [stage1, stage2, stage3];
 
 export default function TreeGarden({
   uses = 0,            // 개인 또는 커뮤니티 사용 횟수
-  perTree = 100,       // 몇 회당 1그루인지
+  perTree = 30,       // 몇 회당 1그루인지
   label = "숲",
   maxColumns = 6,      // 그리드 열 개수
 }) {
