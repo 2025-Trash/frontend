@@ -120,3 +120,8 @@
   font-size: 12px;
   margin-top: 4px;
 }
+
+/* 로그인 */
+.signin-prompt { text-align: center; margin-top: 12px; color: #757575; font-size: 14px; }
+.signin-link { color: #4CAF50; font-weight: 700; text-decoration: underline; }
+.signin-link:hover { opacity: 0.8; }

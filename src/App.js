@@ -5,6 +5,7 @@ import Validating from "./pages/Validating";
 import ValidatedSuccess from "./pages/ValidatedSuccess";
 import TransactionDetail from "./pages/TransactionDetail";
 import Dashboard from "./pages/Dashboard";
+import LoginPage from "./pages/Loginpage";
 
 export default function App() {
   const [params] = useSearchParams();
@@ -14,6 +15,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Welcome />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/validating" element={<Validating />} />
       <Route path="/validated" element={<ValidatedSuccess />} />
       <Route path="/transaction" element={<TransactionDetail />} />
